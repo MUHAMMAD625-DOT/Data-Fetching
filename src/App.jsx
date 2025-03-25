@@ -5,11 +5,11 @@ const BASE_URL = "https://jsonplaceholder.typicode.com";
 
 function App() {
   const [error, setError] = useState();
-  const [posts, setPosts] = useState("");
-  const [isLoading, setIsLoading] = useState("false");
+  const [posts, setPosts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(0);
 
-  const abortControllerRef =useRef<AbortController | null>(null); 
+  const abortControllerRef = useRef(null); 
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -18,14 +18,14 @@ function App() {
 
       setIsLoading(true);
       try {
-        const response = await fetch(`${BASE_URL}/posts?page=${page}`,{
-          signal:  abortControllerRef.current?.signal,
+        const response = await fetch(`${BASE_URL}/posts?_page=${page}&_limit=10`, {
+          signal: abortControllerRef.current?.signal,
         });
         const posts = await response.json();
         setPosts(posts);
       } catch (e) {
-        if(e.error ==="AbortError"){
-          console.log("Aborted");
+        if (e.name === 'AbortError') {
+
           return;
         }
         setError(e);
@@ -36,16 +36,19 @@ function App() {
     fetchPosts();
   }, [page]);
 
-  // if (isLoading) {
-  //   return <div>loading...</div>;
-  // }
   if (error) {
-    return <div>something went wrong ! please try Again</div>;
+    return <div>something went wrong! please try Again</div>;
   }
+
   return (
     <div>
-      <h1>Data Fetching In React</h1>
-      <button onClick={() => setPage(page + 1)} className="bg-red-400 p-2 border rounded">increase page ({page})</button>
+      <h1 className="text-3xl font-bold">Data Fetching In React</h1>
+      <button 
+        onClick={() => setPage(page + 1)} 
+        className="bg-red-400 p-2 border font-bold rounded"
+      >
+        increase page ({page})
+      </button>
       {isLoading && <div>loading...</div>}
       {!isLoading && (
         <ul>
@@ -59,5 +62,3 @@ function App() {
 }
 
 export default App;
-
-
